@@ -47,8 +47,6 @@ printf_loop:
 	lbu	$a0, 0($s0)
 	beqz	$a0, printf_ret
 	beq     $a0, '%', printf_format
-	# My added code starts here
-	beq	$a0, '\', printf_format
 	# print the character
 	li	$v0, 11
 	syscall
@@ -74,8 +72,6 @@ printf_str:
 	j 	printf_last
 printf_last:
 	addi	$s0, $s0, 1 # move to next character
-	j	printf_loop
-printf_escape:
 	j	printf_loop
 printf_ret:
 	#restore RTE

@@ -41,8 +41,8 @@
 	# Macro : push($reg)
 	# Usage: push(<register pushed to stack>)
 	.macro push($reg)
-	addi	$sp, $sp, -4	# Moves stack pointer so it can store 4 bytes
 	sw	$reg, 0($sp)	# Stores register
+	addi	$sp, $sp, -4
 	.end_macro
 	
 	# Macro : pop($reg)
