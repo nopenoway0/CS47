@@ -22,32 +22,34 @@ insertion_sort:
 	addi	$fp, $sp, 24
 	# Implement insertion sort (TBD)
 	# while $s0, or index is >=0 continue to swap as necessary
+	add	$t5, $zero, $zero
 	move	$s2, $a1
 insertion_loop:
 	sll	$t0, $s2, 2
 	add	$t1, $a0, $t0 
 	lw	$s0, 0($a0)	# Grabbed the value at the according index
 insertion_loop_element:
-	slti 	$t0, $a1, 2
-	bnez	$t0, insertion_sort_end
-	addi	$a1, $a1, -1
-	sll	$t0, $a1, 2
+	slt 	$t0, $t5, $a1
+	beqz	$t0, is_over
+	addi	$t5, $t5, 1
+	sll	$t0, $t5, 2
 	add	$t1, $t0, $a0
-	lw	$s1, 0($a0)
+	lw	$s1, 0($t1)
 	slt	$t2, $s0, $s1
 	beqz	$t2, insertion_loop
 	# swap $s1 and $s0
-	sw	$s1, 0($a0)
+	sw	$s1, 0($t1)
 	j insertion_loop_element
 	
+is_over:
 	addi	$s2, $s2, -1
 	bnez	$s2, insertion_loop
 	
 	
 insertion_sort_end:
 	# Caller RTE restore (TBD)
-	sll	$t0, $a1, 2
-	add	$t1, $a0, $t0
+	# sll	$t0, $a1, 2
+	# add	$t1, $a0, $t0
 	sw	$s1, 0($a0)
 	lw	$fp, 0($sp)
 	lw	$a0, 4($sp)
