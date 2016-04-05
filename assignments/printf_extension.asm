@@ -46,6 +46,7 @@ printf:
 printf_loop:
 	lbu	$a0, 0($s0)
 	beqz	$a0, printf_ret
+	beq	$a0, '\\', printf_escape	# Double backslash means a single one because one is for the assembler itself
 	beq     $a0, '%', printf_format
 	# print the character
 	li	$v0, 11
@@ -60,6 +61,13 @@ printf_format:
 	lbu	$a0, 0($s0)
 	beq 	$a0, 'd', printf_int
 	beq	$a0, 's', printf_str
+printf_escape:		#Print a single character, should print percentage which means it'll print the 's'
+	addi	$s0, $s0, 1
+	lbu	$a0, 0($s0)
+	beqz	$a0, printf_ret
+	li	$v0, 11
+	syscall
+	j	printf_last
 printf_int: 
 	lw	$a0, 0($t0)
 	li	$v0, 1
@@ -115,6 +123,6 @@ main:
 	pop($t0)
 	pop($t0)
 	
-	la	$a0, format3
+	la	$a0, format3 # Starts here
 	jal 	printf
 	exit
