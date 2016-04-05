@@ -21,22 +21,22 @@ insertion_sort:
 	sw	$s2, 20($sp)
 	addi	$fp, $sp, 24
 	# Implement insertion sort (TBD)
-	# while $s0, or index is >=0 continue to swap as necessary
-	add	$t5, $zero, $zero
+	# while $s0, or index is >=0 continue to swap as necessary	
 	move	$s2, $a1
 insertion_loop:
+	add	$t5, $zero, $zero
 	sll	$t0, $s2, 2
 	add	$t1, $a0, $t0 
-	lw	$s0, 0($a0)	# Grabbed the value at the according index
+	lw	$s0, 0($t1)	# Grabbed the value at the according index
 insertion_loop_element:
-	slt 	$t0, $t5, $a1
+	slt 	$t0, $t5, $s2
 	beqz	$t0, is_over
-	addi	$t5, $t5, 1
 	sll	$t0, $t5, 2
 	add	$t1, $t0, $a0
 	lw	$s1, 0($t1)
 	slt	$t2, $s0, $s1
-	beqz	$t2, insertion_loop
+	addi	$t5, $t5, 1
+	beqz	$t2, insertion_loop_element
 	# swap $s1 and $s0
 	sw	$s1, 0($t1)
 	j insertion_loop_element
