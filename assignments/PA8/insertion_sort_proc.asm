@@ -22,33 +22,24 @@ insertion_sort:
 	addi	$fp, $sp, 24
 	# Implement insertion sort (TBD)
 	# while $s0, or index is >=0 continue to swap as necessary
-	move	$s2, $a1
+	li	$s0, 1
+		
 insertion_loop:
-	sll	$t0, $s2, 2
-	add	$t1, $a0, $t0 
-	lw	$s0, 0($a0)	# Grabbed the value at the according index
-insertion_loop_element:
-	slti 	$t0, $a1, 2
-	bnez	$t0, insertion_sort_end
-	addi	$a1, $a1, -1
-	sll	$t0, $a1, 2
+	sll	$t0, $s0, 2	# Turn index into navigatable number within the array
 	add	$t1, $t0, $a0
-	lw	$s1, 0($a0)
-	slt	$t2, $s0, $s1
-	beqz	$t2, insertion_loop
-	# swap $s1 and $s0
-	sw	$s1, 0($a0)
-	j insertion_loop_element
-	
-	addi	$s2, $s2, -1
-	bnez	$s2, insertion_loop
+	lw	$t2, -4($t1)	# Grab the previous word
+	lw	$t3, 0($t1)	# Grab next element in array
+	# Compare the value with the previous element
+	slt	$t4, $t2, $t3
+	beqz	$t4, swap
+	j	insertion_sort_end
+swap:
+	sw	$t3, -4($t1)
+	sw	$t2, 0($t1)
 	
 	
 insertion_sort_end:
 	# Caller RTE restore (TBD)
-	sll	$t0, $a1, 2
-	add	$t1, $a0, $t0
-	sw	$s1, 0($a0)
 	lw	$fp, 0($sp)
 	lw	$a0, 4($sp)
 	lw	$a1, 8($sp)
