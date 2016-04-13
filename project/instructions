@@ -1,0 +1,5 @@
+Finish 2 procedures, do not edit auto_test.asm
+	au_normal: au_normal: 
+	It takes three arguments as $a0 (First operand), $a1 (Second operand), $a2 (Operation code '+', '-',  '*', '/'  - ASCII code). It returns result in $v0 and $v1 (for multiplication $v1 it will contain HI, for division $v1 will contain remainder). This procedure uses normal math operations of MIPS to compute the result (add, sub, mul and div)
+	au_logical:
+	It takes three arguments as $a0 (First operand), $a1 (Second operand), $a2 (Operation code '+', '-',  '*', '/'  - ASCII code). It returns result in $v0 and $v1 (for multiplication $v1 it will contain HI, for division $v1 will contain remainder). The evaluation of mathematical operations should use MIPS logic operations only (result should not be generated directly using MIPS mathematical operations). The implementation needs to follow the digital algorithm implemented in hardware to implement the mathematical operations.
