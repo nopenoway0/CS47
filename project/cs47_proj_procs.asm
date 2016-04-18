@@ -82,6 +82,27 @@ printf_ret:
 #####################################################################
 au_logical:
 # TBD: Complete it
+	beq 	$a2, 0x2D, sub_logical 		# 2D = -
+	beq	$a2, 0x2B, add_logical 		# 2B = +
+	beq	$a2, 0x2F, div_logical 		# 2F = /
+	beq	$a2, 0x2A, mult_logical 	# 2A = *
+mult_logical:
+	mult	$a0, $a1
+	mfhi	$v1
+	mflo	$v0
+	j	return_logical
+add_logical:
+	add	$v0, $a0, $a1
+	j	return_logical
+sub_logical:
+	sub	$v0, $a0, $a1
+	j	return_logical
+div_logical:
+	div	$a0, $a1
+	mfhi	$v0
+	mflo	$v1
+	j	return_logical
+return_logical:
 	jr 	$ra
 	
 #####################################################################
