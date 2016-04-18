@@ -73,3 +73,12 @@
 	la	$a0, $format
 	jal	printf
 	.end_macro
+	
+	.macro get_bit($r_reg, $bit, $bit_num)
+	li	$bit, 1
+	addi	$bit_num, -1
+	sllv	$bit, $bit, $bit_num
+	and	$bit, $r_reg, $bit
+	srlv	$bit, $bit, $bit_num
+	.end_macro
+	

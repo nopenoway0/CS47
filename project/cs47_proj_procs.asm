@@ -81,6 +81,20 @@ printf_ret:
 # Notes:
 #####################################################################
 au_logical:
+	jr 	$ra
+	
+#####################################################################
+# Implement au_normal
+# Argument:
+# 	$a0: First number
+#	$a1: Second number
+#	$a2: operation code ('+':add, '-':sub, '*':mul, '/':div)
+# Return:
+#	$v0: ($a0+$a1) | ($a0-$a1) | ($a0*$a1):LO | ($a0 / $a1)
+# 	$v1: ($a0 * $a1):HI | ($a0 % $a1)
+# Notes:
+#####################################################################
+au_normal:
 # TBD: Complete it
 	beq 	$a2, 0x2D, sub_logical 		# 2D = -
 	beq	$a2, 0x2B, add_logical 		# 2B = +
@@ -103,19 +117,4 @@ div_logical:
 	mflo	$v1
 	j	return_logical
 return_logical:
-	jr 	$ra
-	
-#####################################################################
-# Implement au_normal
-# Argument:
-# 	$a0: First number
-#	$a1: Second number
-#	$a2: operation code ('+':add, '-':sub, '*':mul, '/':div)
-# Return:
-#	$v0: ($a0+$a1) | ($a0-$a1) | ($a0*$a1):LO | ($a0 / $a1)
-# 	$v1: ($a0 * $a1):HI | ($a0 % $a1)
-# Notes:
-#####################################################################
-au_normal:
-# TBD: Complete it
 	jr	$ra
