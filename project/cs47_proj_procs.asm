@@ -81,6 +81,38 @@ printf_ret:
 # Notes:
 #####################################################################
 au_logical:
+	j	add_logical
+	addi	$sp, $sp, -32
+	sw	$a0, 0($sp)
+	sw	$a1, 4($sp)
+	sw	$a2, 8($sp)
+	sw	$a3, 12($sp)
+	sw	$fp, 16($sp)
+	sw	$s0, 20($sp)	# Store result
+	sw	$s1, 24($sp)	# Carry values
+	addi	$fp, $sp, 32
+add_logical:
+	li	$t0, 0		# Counter for loop through bits
+	li	$s1, 0		# Clear for use of the carry
+add_logical_loop:
+	get_bit($a0, $t1, $t0)
+	get_bit($a0, $t2, $t0)
+	and	$s1, $t1, $t2
+	xor	$t3, $t1, $t2
+	or	$s0, $t3, $s0
+	addi	$t0, $t0, 1
+end_logical_loop:
+	or	$v0, $s0, $zero
+	j	restore_return_logical
+restore_return_logical:
+	lw	$a0, 0($sp)
+	lw	$a1, 4($sp)
+	lw	$a2, 8($sp)
+	lw	$a3, 12($sp)
+	lw	$fp, 16($sp)
+	lw	$s0, 20($sp)
+	lw	$s1, 24($sp)
+	addi	$sp, $sp, 32
 	jr 	$ra
 	
 #####################################################################
