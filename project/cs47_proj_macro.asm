@@ -76,10 +76,8 @@
 	
 	.macro get_bit($r_reg, $bit, $bit_num)
 	li	$bit, 1
-	addi	$bit_num, -1
 	sllv	$bit, $bit, $bit_num
 	and	$bit, $r_reg, $bit
 	srlv	$bit, $bit, $bit_num
-	addi	$bit_num, $bit_num, 1
 	.end_macro
 	

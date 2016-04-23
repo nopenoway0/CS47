@@ -81,8 +81,7 @@ printf_ret:
 # Notes:
 #####################################################################
 au_logical:
-	j	add_logical
-	addi	$sp, $sp, -32
+	addi	$sp, $sp, -36
 	sw	$a0, 0($sp)
 	sw	$a1, 4($sp)
 	sw	$a2, 8($sp)
@@ -90,17 +89,23 @@ au_logical:
 	sw	$fp, 16($sp)
 	sw	$s0, 20($sp)	# Store result
 	sw	$s1, 24($sp)	# Carry values
-	addi	$fp, $sp, 32
+	sw	$ra, 28($sp)
+	addi	$fp, $sp, 36
+	j	add_logical
 add_logical:
 	li	$t0, 0		# Counter for loop through bits
 	li	$s1, 0		# Clear for use of the carry
 add_logical_loop:
+	slti	$t4, $t0, 32
+	beqz	$t4, end_logical_loop
 	get_bit($a0, $t1, $t0)
-	get_bit($a0, $t2, $t0)
+	get_bit($a1, $t2, $t0)
 	and	$s1, $t1, $t2
 	xor	$t3, $t1, $t2
+	xor	$t3, $s1, $t3
 	or	$s0, $t3, $s0
 	addi	$t0, $t0, 1
+	j	add_logical_loop
 end_logical_loop:
 	or	$v0, $s0, $zero
 	j	restore_return_logical
@@ -112,7 +117,8 @@ restore_return_logical:
 	lw	$fp, 16($sp)
 	lw	$s0, 20($sp)
 	lw	$s1, 24($sp)
-	addi	$sp, $sp, 32
+	lw	$ra, 28($sp)
+	addi	$sp, $sp, 36
 	jr 	$ra
 	
 #####################################################################
@@ -128,25 +134,25 @@ restore_return_logical:
 #####################################################################
 au_normal:
 # TBD: Complete it
-	beq 	$a2, 0x2D, sub_logical 		# 2D = -
-	beq	$a2, 0x2B, add_logical 		# 2B = +
-	beq	$a2, 0x2F, div_logical 		# 2F = /
-	beq	$a2, 0x2A, mult_logical 	# 2A = *
-mult_logical:
+	beq 	$a2, 0x2D, sub_normal 		# 2D = -
+	beq	$a2, 0x2B, add_normal 		# 2B = +
+	beq	$a2, 0x2F, div_normal 		# 2F = /
+	beq	$a2, 0x2A, mult_normal  	# 2A = *
+mult_normal:
 	mult	$a0, $a1
 	mfhi	$v1
 	mflo	$v0
-	j	return_logical
-add_logical:
+	j	return_normal
+add_normal:
 	add	$v0, $a0, $a1
-	j	return_logical
-sub_logical:
+	j	return_normal
+sub_normal:
 	sub	$v0, $a0, $a1
-	j	return_logical
-div_logical:
+	j	return_normal
+div_normal:
 	div	$a0, $a1
 	mfhi	$v0
 	mflo	$v1
-	j	return_logical
-return_logical:
+	j	return_normal
+return_normal:
 	jr	$ra
