@@ -92,15 +92,16 @@ au_logical:
 	sw	$ra, 28($sp)
 	addi	$fp, $sp, 36
 	li	$t0, 0
-	li	$s1, 0
 	li	$s0, 0
 	beq 	$a2, 0x2D, sub_logical 		# 2D = -
 	beq	$a2, 0x2B, add_logical		# 2B = +
 	j	restore_return_logical
 sub_logical:
 	nor	$a1, $a1, $zero
+	li	$s1, 1
 	j	add_logical_loop
 add_logical:
+	li	$s1, 0
 	j	add_logical_loop
 add_logical_loop:
 	slti	$t4, $t0, 32
