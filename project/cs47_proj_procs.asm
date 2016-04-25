@@ -92,7 +92,8 @@ au_logical:
 	sw	$ra, 28($sp)
 	addi	$fp, $sp, 36
 	beq 	$a2, 0x2D, sub_logical 		# 2D = -
-	j	add_logical
+	beq	$a2, 0x2B, add_logical		# 2B = +
+	j	restore_return_logical
 sub_logical:
 	li	$t0, 0
 	li	$s1, 1
@@ -104,11 +105,14 @@ add_logical:
 add_logical_loop:
 	slti	$t4, $t0, 31
 	beqz	$t4, end_logical_loop
-	get_bit($a0, $t1, $t0)
-	get_bit($a1, $t2, $t0)
-	and	$s1, $t1, $t2
-	xor	$t3, $t1, $t2
-	xor	$t3, $s1, $t3
+	get_bit($a0, $t1, $t0)	# t1 = A
+	get_bit($a1, $t2, $t0)	# t2 = B
+				# s1 = C
+	xor	$t3, $t1, $t2	# t6 = middle of 1
+	and	$t6, $t3, $s1
+	xor	$t3, $s1, $t3	# t7 = second middle
+	and	$t7, $t1, $t2
+	or	$s1, $t6, $t7
 	sllv	$t3, $t3, $t0
 	or	$s0, $t3, $s0
 	addi	$t0, $t0, 1
