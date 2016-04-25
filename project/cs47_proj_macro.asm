@@ -78,6 +78,6 @@
 	li	$bit, 1
 	sllv	$bit, $bit, $bit_num
 	and	$bit, $r_reg, $bit
-	##srlv	$bit, $bit, $bit_num
+	srlv	$bit, $bit, $bit_num
 	.end_macro
 	

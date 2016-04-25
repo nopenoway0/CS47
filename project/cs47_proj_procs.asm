@@ -109,6 +109,7 @@ add_logical_loop:
 	and	$s1, $t1, $t2
 	xor	$t3, $t1, $t2
 	xor	$t3, $s1, $t3
+	sllv	$t3, $t3, $t0
 	or	$s0, $t3, $s0
 	addi	$t0, $t0, 1
 	j	add_logical_loop
