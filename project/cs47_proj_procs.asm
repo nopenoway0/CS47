@@ -91,19 +91,19 @@ au_logical:
 	sw	$s1, 24($sp)	# Carry values
 	sw	$ra, 28($sp)
 	addi	$fp, $sp, 36
+	li	$t0, 0
+	li	$s1, 0
+	li	$s0, 0
 	beq 	$a2, 0x2D, sub_logical 		# 2D = -
 	beq	$a2, 0x2B, add_logical		# 2B = +
 	j	restore_return_logical
 sub_logical:
-	li	$t0, 0
-	li	$s1, 1
 	nor	$a1, $a1, $zero
 	j	add_logical_loop
 add_logical:
-	li	$t0, 0		# Counter for loop through bits
-	li	$s1, 0		# Clear for use of the carry
+	j	add_logical_loop
 add_logical_loop:
-	slti	$t4, $t0, 31
+	slti	$t4, $t0, 32
 	beqz	$t4, end_logical_loop
 	get_bit($a0, $t1, $t0)	# t1 = A
 	get_bit($a1, $t2, $t0)	# t2 = B
