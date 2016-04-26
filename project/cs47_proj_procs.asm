@@ -95,6 +95,7 @@ au_logical:
 	li	$s0, 0
 	beq 	$a2, 0x2D, sub_logical 		# 2D = -
 	beq	$a2, 0x2B, add_logical		# 2B = +
+	beq	$a2, 0x2A, mult_logical		# 2A = *
 	j	restore_return_logical
 sub_logical:
 	nor	$a1, $a1, $zero
@@ -120,6 +121,11 @@ add_logical_loop:
 	j	add_logical_loop
 end_logical_loop:
 	or	$v0, $s0, $zero
+	j	restore_return_logical
+mult_logical:
+	
+mult_logical_loop:
+mult_logical_end:
 	j	restore_return_logical
 restore_return_logical:
 	lw	$a0, 0($sp)
