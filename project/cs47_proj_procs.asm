@@ -81,7 +81,7 @@ printf_ret:
 # Notes:
 #####################################################################
 au_logical:
-	addi	$sp, $sp, -44
+	addi	$sp, $sp, -52
 	sw	$a0, 0($sp)
 	sw	$a1, 4($sp)
 	sw	$a2, 8($sp)
@@ -92,7 +92,9 @@ au_logical:
 	sw	$ra, 28($sp)
 	sw	$s2, 32($sp)
 	sw	$s3, 36($sp)
-	addi	$fp, $sp, 44
+	sw	$s4, 40($sp)
+	sw	$s5, 44($sp)
+	addi	$fp, $sp, 52
 	li	$t0, 0		# Loop counter
 	li	$s0, 0
 	li	$v0, 0		# Initilaize result to 0
@@ -127,13 +129,18 @@ add_logical_loop:
 end_logical_loop:
 	or	$v0, $s0, $zero
 	j	restore_return_logical
+	
 mult_logical:
+	li	$s4, 0
 	li	$s1, 0
+	li	$s5, 0
 	or	$s2, $zero, $a0
 	or	$s3, $zero, $a1
 mult_logical_loop:
 	beqz	$s3, mult_logical_end
-	get_bit($s3, $t0, $zero)	# $s0 is product
+	slti	$t0, $s4, 16
+	beqz	$t0, mult_logical_hi
+	get_bit($s3, $t0, $zero)	# $s0 is product lo
 	beqz	$t0, mult_is_not_1	# $s1 carry over if necessary					
 mult_is_1:				# $s2 multiplier
 	or	$a0, $s2, $zero		# $s3 multiplicand the right -> shifter
@@ -144,11 +151,31 @@ mult_is_1:				# $s2 multiplier
 mult_is_not_1:
 	sll	$s2, $s2, 1
 	srl	$s3, $s3, 1
+	addi	$s4, $s4, 1
 	j	mult_logical_loop
+	
+mult_logical_hi:
+	li	$s4, 0
+mult_logical_loop_hi:
+	beqz	$s3, mult_logical_end
+	get_bit($s3, $t0, $zero)	# $s5 is product hi
+	beqz	$t0, mult_is_not_1_hi	# $s1 carry over if necessary					
+mult_is_1_hi:				# $s2 multiplier
+	or	$a0, $s2, $zero		# $s3 multiplicand the right -> shifter
+	or	$a1, $s5, $zero	
+	ori	$a2, $zero, 0x2B 
+	jal	au_logical
+	or 	$s5, $v0, $zero						
+mult_is_not_1_hi:
+	sll	$s2, $s2, 1
+	srl	$s3, $s3, 1
+	j	mult_logical_loop_hi
+	
 mult_logical_end:
 	j	restore_return_logical
 restore_return_logical:
 	or	$v0, $s0, $zero
+	or	$v1, $s5, $zero
 	lw	$a0, 0($sp)
 	lw	$a1, 4($sp)
 	lw	$a2, 8($sp)
@@ -159,7 +186,9 @@ restore_return_logical:
 	lw	$ra, 28($sp)
 	lw	$s2, 32($sp)
 	lw	$s3, 36($sp)
-	addi	$sp, $sp, 44
+	lw	$s4, 40($sp)
+	lw	$s5, 44($sp)
+	addi	$sp, $sp, 52
 	jr 	$ra
 	
 #####################################################################
