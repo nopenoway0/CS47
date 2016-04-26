@@ -81,7 +81,7 @@ printf_ret:
 # Notes:
 #####################################################################
 au_logical:
-	addi	$sp, $sp, -36
+	addi	$sp, $sp, -44
 	sw	$a0, 0($sp)
 	sw	$a1, 4($sp)
 	sw	$a2, 8($sp)
@@ -90,8 +90,10 @@ au_logical:
 	sw	$s0, 20($sp)	# Store result
 	sw	$s1, 24($sp)	# Carry values
 	sw	$ra, 28($sp)
-	addi	$fp, $sp, 36
-	li	$t0, 0
+	sw	$s2, 32($sp)
+	sw	$s3, 36($sp)
+	addi	$fp, $sp, 44
+	li	$t0, 0		# Loop counter
 	li	$s0, 0
 	beq 	$a2, 0x2D, sub_logical 		# 2D = -
 	beq	$a2, 0x2B, add_logical		# 2B = +
@@ -123,11 +125,27 @@ end_logical_loop:
 	or	$v0, $s0, $zero
 	j	restore_return_logical
 mult_logical:
-	
+	li	$s1, 0
+	or	$s2, $zero, $a0
+	or	$s3, $zero, $a1
 mult_logical_loop:
+	beqz	$s3, mult_logical_end
+	get_bit($s3, $t0, $zero)	# $s0 is product
+	beqz	$t0, mult_is_not_1	# $s1 carry over if necessary					
+mult_is_1:				# $s2 multiplier
+	or	$a0, $s2, $zero		# $s3 multiplicand the right -> shifter
+	or	$a1, $s0, $zero	
+	ori	$a2, $zero, 0x2B 	
+	jal	au_logical		
+mult_is_not_1:
+	or 	$s0, $v0, $zero			
+	sll	$s2, $s2, 1
+	srl	$s3, $s3, 1
+	j	mult_logical_loop
 mult_logical_end:
 	j	restore_return_logical
 restore_return_logical:
+	or	$v0, $s0, $zero
 	lw	$a0, 0($sp)
 	lw	$a1, 4($sp)
 	lw	$a2, 8($sp)
@@ -136,7 +154,9 @@ restore_return_logical:
 	lw	$s0, 20($sp)
 	lw	$s1, 24($sp)
 	lw	$ra, 28($sp)
-	addi	$sp, $sp, 36
+	lw	$s2, 32($sp)
+	lw	$s3, 36($sp)
+	addi	$sp, $sp, 44
 	jr 	$ra
 	
 #####################################################################
