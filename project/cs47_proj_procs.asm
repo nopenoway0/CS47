@@ -124,8 +124,8 @@ add_logical_loop:
 	sllv	$t3, $t3, $t0
 	or	$s0, $t3, $s0
 	addi	$t0, $t0, 1
-	
 	j	add_logical_loop
+	
 end_logical_loop:
 	or	$v0, $s0, $zero
 	j	restore_return_logical
@@ -134,8 +134,20 @@ mult_logical:
 	li	$s4, 0
 	li	$s1, 0
 	li	$s5, 0
+	li	$t1, 31
+	
+
+	get_bit($a0, $t0, $t1)
+	bnez	$t0, invert_a0
 	or	$s2, $zero, $a0
+	
+test_for_inversion_a1:
+	get_bit($a1, $t0, $t1)
+	bnez	$t0, invert_a1
+
+end_inversion_test:
 	or	$s3, $zero, $a1
+	
 mult_logical_loop:
 	beqz	$s3, mult_logical_end
 	slti	$t0, $s4, 16
@@ -172,10 +184,11 @@ mult_is_not_1_hi:
 	j	mult_logical_loop_hi
 	
 mult_logical_end:
-	j	restore_return_logical
-restore_return_logical:
 	or	$v0, $s0, $zero
 	or	$v1, $s5, $zero
+	j	restore_return_logical
+restore_return_logical:
+
 	lw	$a0, 0($sp)
 	lw	$a1, 4($sp)
 	lw	$a2, 8($sp)
@@ -190,7 +203,24 @@ restore_return_logical:
 	lw	$s5, 44($sp)
 	addi	$sp, $sp, 52
 	jr 	$ra
-	
+invert_a0:
+	nor	$a0, $a0, $zero
+	li	$a1, 1
+	li	$a2, 0x2B
+	jal	au_logical
+	lw	$a1, 4($sp)
+	lw	$a2, 8($sp)
+	or	$s2, $zero, $v0
+	j	test_for_inversion_a1
+invert_a1:	
+	nor	$a1, $a1, $zero
+	li	$a0, 1
+	li	$a2, 0x2B
+	jal	au_logical
+	lw	$a0, 0($sp)
+	lw	$a2, 8($sp)
+	j	end_inversion_test
+
 #####################################################################
 # Implement au_normal
 # Argument:
