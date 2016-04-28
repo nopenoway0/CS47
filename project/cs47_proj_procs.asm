@@ -102,6 +102,7 @@ au_logical:
 	beq 	$a2, 0x2D, sub_logical 		# 2D = -
 	beq	$a2, 0x2B, add_logical		# 2B = +
 	beq	$a2, 0x2A, mult_logical		# 2A = *
+	beq	$a2, 0x2F, div_logical
 	j	restore_return_logical
 sub_logical:
 	nor	$a1, $a1, $zero
@@ -158,7 +159,8 @@ mult_is_1:				# $s2 multiplier
 	or	$a1, $s0, $zero	
 	ori	$a2, $zero, 0x2B 
 	jal	au_logical
-	or 	$s0, $v0, $zero						
+	or 	$s0, $v0, $zero		
+					
 mult_is_not_1:
 	sll	$s2, $s2, 1
 	srl	$s3, $s3, 1
@@ -167,8 +169,9 @@ mult_is_not_1:
 	
 mult_logical_hi:
 	li	$s4, 0
+	
 mult_logical_loop_hi:
-	beqz	$s3, mult_logical_end
+	beqz	$s3,multiplier_zero
 	get_bit($s3, $t0, $zero)	# $s5 is product hi
 	beqz	$t0, mult_is_not_1_hi	# $s1 carry over if necessary					
 mult_is_1_hi:				# $s2 multiplier
@@ -176,7 +179,8 @@ mult_is_1_hi:				# $s2 multiplier
 	or	$a1, $s5, $zero	
 	ori	$a2, $zero, 0x2B 
 	jal	au_logical
-	or 	$s5, $v0, $zero						
+	or 	$s5, $v0, $zero	
+						
 mult_is_not_1_hi:
 	sll	$s2, $s2, 1
 	srl	$s3, $s3, 1
@@ -186,8 +190,26 @@ mult_logical_end:
 	or	$v0, $s0, $zero
 	or	$v1, $s5, $zero
 	j	restore_return_logical
+	
+div_logical:
+	li	$s0, 0	# Quotient
+	li	$s1, 0 	# Remainder but probably not
+	move	$s2, $a0
+	li	$s3, 0 	# Counter
+div_logical_loop:
+	slti	$t0, $s3, 31 
+	beqz	$t0, restore_return_logical
+	slt	$t0, $s2, $a1
+	bnez	$s2, end_division_logical
+	move	$a0, $s2
+	jal	sub_logical
+	addi	$s3, $s3, 1
+	
+end_division_logical:
+	move	$v1, $s2	#Remainder
+	li	$v0, 0
+	
 restore_return_logical:
-
 	lw	$a0, 0($sp)
 	lw	$a1, 4($sp)
 	lw	$a2, 8($sp)
@@ -202,6 +224,7 @@ restore_return_logical:
 	lw	$s5, 44($sp)
 	addi	$sp, $sp, 52
 	jr 	$ra
+	
 invert_a0:
 	nor	$a0, $a0, $zero
 	li	$a1, 1
@@ -212,6 +235,7 @@ invert_a0:
 	lw	$a2, 8($sp)
 	or	$s2, $zero, $v0
 	j	test_for_inversion_a1
+	
 invert_a1:	
 	nor	$a1, $a1, $zero
 	li	$a0, 1
@@ -223,6 +247,15 @@ invert_a1:
 	or	$s3, $zero, $v0
 	li	$v0, 0
 	j	mult_logical_loop
+
+multiplier_zero:
+	li	$t0, 31
+	get_bit($a0, $t1, $t0)
+	get_bit($a1, $t2, $t0)
+	xor	$t3, $t2, $t1
+	beqz	$t3, mult_logical_end
+	nor	$s5, $zero, $zero
+	j	mult_logical_end
 
 #####################################################################
 # Implement au_normal
