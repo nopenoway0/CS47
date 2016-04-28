@@ -150,11 +150,10 @@ dont_invert_a0:
 	beqz	$t0, dont_invert_a1
 	move	$a0, $a1
 	jal	invert_number
-	or	$a1, $v0, $zero
+	or	$s3, $v0, $zero
 	
 dont_invert_a1:
 	j	mult_logical_loop
-
 	
 mult_logical_loop:
 	beqz	$s3, mult_logical_end
