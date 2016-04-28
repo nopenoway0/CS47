@@ -142,10 +142,9 @@ mult_logical:
 	or	$s2, $zero, $a0
 	
 test_for_inversion_a1:
+	li	$t1, 31
 	get_bit($a1, $t0, $t1)
 	bnez	$t0, invert_a1
-
-end_inversion_test:
 	or	$s3, $zero, $a1
 	
 mult_logical_loop:
@@ -208,6 +207,7 @@ invert_a0:
 	li	$a1, 1
 	li	$a2, 0x2B
 	jal	au_logical
+	lw	$a0, 0($sp)
 	lw	$a1, 4($sp)
 	lw	$a2, 8($sp)
 	or	$s2, $zero, $v0
@@ -218,8 +218,11 @@ invert_a1:
 	li	$a2, 0x2B
 	jal	au_logical
 	lw	$a0, 0($sp)
+	lw	$a1, 4($sp)
 	lw	$a2, 8($sp)
-	j	end_inversion_test
+	or	$s3, $zero, $v0
+	li	$v0, 0
+	j	mult_logical_loop
 
 #####################################################################
 # Implement au_normal
