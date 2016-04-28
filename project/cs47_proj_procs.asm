@@ -135,18 +135,26 @@ mult_logical:
 	li	$s4, 0
 	li	$s1, 0
 	li	$s5, 0
+	
 	li	$t1, 31
-	
-
 	get_bit($a0, $t0, $t1)
-	bnez	$t0, invert_a0
 	or	$s2, $zero, $a0
+	beqz	$t0, dont_invert_a0
+	jal	invert_number
+	or	$s2, $zero, $v0
 	
-test_for_inversion_a1:
+dont_invert_a0:	
 	li	$t1, 31
 	get_bit($a1, $t0, $t1)
-	bnez	$t0, invert_a1
-	or	$s3, $zero, $a1
+	or	$s3, $a1, $zero
+	beqz	$t0, dont_invert_a1
+	move	$a0, $a1
+	jal	invert_number
+	or	$a1, $v0, $zero
+	
+dont_invert_a1:
+	j	mult_logical_loop
+
 	
 mult_logical_loop:
 	beqz	$s3, mult_logical_end
@@ -226,29 +234,6 @@ restore_return_logical:
 	lw	$s5, 44($sp)
 	addi	$sp, $sp, 52
 	jr 	$ra
-	
-invert_a0:
-	nor	$a0, $a0, $zero
-	li	$a1, 1
-	li	$a2, 0x2B
-	jal	au_logical
-	lw	$a0, 0($sp)
-	lw	$a1, 4($sp)
-	lw	$a2, 8($sp)
-	or	$s2, $zero, $v0
-	j	test_for_inversion_a1
-	
-invert_a1:	
-	nor	$a1, $a1, $zero
-	li	$a0, 1
-	li	$a2, 0x2B
-	jal	au_logical
-	lw	$a0, 0($sp)
-	lw	$a1, 4($sp)
-	lw	$a2, 8($sp)
-	or	$s3, $zero, $v0
-	li	$v0, 0
-	j	mult_logical_loop
 
 multiplier_zero:
 	li	$t0, 31
@@ -258,6 +243,28 @@ multiplier_zero:
 	beqz	$t3, mult_logical_end
 	nor	$s5, $zero, $zero
 	j	mult_logical_end
+
+# Inverts a0 and stores it into v0
+invert_number:
+	addi	$sp, $sp, -24
+	sw	$a0, 0($sp)
+	sw	$a1, 4($sp)
+	sw	$a2, 8($sp)
+	sw	$fp, 12($sp)
+	sw	$ra, 16($sp)
+	addi	$fp, $sp, 24
+	li	$a1, 1
+	nor	$a0, $zero, $a0
+	li	$a2, 0x2B
+	jal	au_logical
+	lw	$a0, 0($sp)
+	lw	$a1, 4($sp)
+	lw	$a2, 8($sp)
+	lw	$fp, 12($sp)
+	lw	$ra, 16($sp)
+	addi	$sp, $sp, 24
+	jr	$ra
+	
 
 #####################################################################
 # Implement au_normal
