@@ -201,18 +201,36 @@ mult_logical_end:
 div_logical:
 	li	$s0, 0	# Quotient
 	li	$s1, 0 	# Remainder but probably not
-	move	$s2, $a0
-	li	$s3, 0 	# Counter
 	
-div_logical_loop:
-	slti	$t0, $s3, 31 
+	li	$t1, 31
+	get_bit($a0, $t0, $t1)
+	or	$s2, $zero, $a0
+	beqz	$t0, dont_invert_a0_div
+	jal	invert_number
+	or	$s2, $zero, $v0
+	
+dont_invert_a0_div:	
+	li	$t1, 31
+	get_bit($a1, $t0, $t1)
+	or	$s3, $a1, $zero
+	beqz	$t0, dont_invert_a1_div
+	move	$a0, $a1
+	jal	invert_number
+	or	$s3, $v0, $zero
+dont_invert_a1_div:
+	move	$a1, $s3
+	li	$s4, 0 	# Counter
+	
+div_logical_loop:			# Check both arguments are positive upon entering the loop - DEBUG
+	slti	$t0, $s4, 31 
 	beqz	$t0, end_division_logical
-	sle	$t0, $s2, $a1
+	sle	$t0, $s2, $s3		# Change to s3?
 	bnez	$t0, end_division_logical
 	move	$a0, $s2
 	jal	sub_logical
 	move	$s2, $v0
-	addi	$s3, $s3, 1
+	addi	$s4, $s4, 1
+	j	div_logical_loop
 	
 end_division_logical:
 	move	$v1, $s2	#Remainder
