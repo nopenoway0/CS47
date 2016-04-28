@@ -196,13 +196,15 @@ div_logical:
 	li	$s1, 0 	# Remainder but probably not
 	move	$s2, $a0
 	li	$s3, 0 	# Counter
+	
 div_logical_loop:
 	slti	$t0, $s3, 31 
-	beqz	$t0, restore_return_logical
-	slt	$t0, $s2, $a1
-	bnez	$s2, end_division_logical
+	beqz	$t0, end_division_logical
+	sle	$t0, $s2, $a1
+	bnez	$t0, end_division_logical
 	move	$a0, $s2
 	jal	sub_logical
+	move	$s2, $v0
 	addi	$s3, $s3, 1
 	
 end_division_logical:
@@ -287,8 +289,8 @@ sub_normal:
 	j	return_normal
 div_normal:
 	div	$a0, $a1
-	mfhi	$v0
-	mflo	$v1
+	mflo	$v0
+	mfhi	$v1
 	j	return_normal
 return_normal:
 	jr	$ra
