@@ -219,6 +219,7 @@ dont_invert_a0_div:
 	or	$s3, $v0, $zero
 dont_invert_a1_div:
 	move	$a1, $s3
+	li	$a2, 0x2D
 	li	$s4, 0 	# Counter
 	
 div_logical_loop:			# Check both arguments are positive upon entering the loop - DEBUG
@@ -227,7 +228,7 @@ div_logical_loop:			# Check both arguments are positive upon entering the loop -
 	sle	$t0, $s2, $s3		# Change to s3?
 	bnez	$t0, end_division_logical
 	move	$a0, $s2
-	jal	sub_logical
+	jal	au_logical
 	move	$s2, $v0
 	addi	$s4, $s4, 1
 	j	div_logical_loop
