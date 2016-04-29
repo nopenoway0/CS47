@@ -234,8 +234,8 @@ div_logical_loop:			# Check both arguments are positive upon entering the loop -
 	j	div_logical_loop
 	
 end_division_logical:
-	move	$v1, $s2	#Remainder
-	li	$v0, 0
+	move	$v1, $s2	# Remainder
+	move	$v0, $s4	# Quotient
 	
 restore_return_logical:
 	lw	$a0, 0($sp)
