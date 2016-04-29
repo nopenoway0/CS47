@@ -225,7 +225,7 @@ dont_invert_a1_div:
 div_logical_loop:			# Check both arguments are positive upon entering the loop - DEBUG
 	slti	$t0, $s4, 31 
 	beqz	$t0, end_division_logical
-	sle	$t0, $s2, $s3		# Change to s3?
+	slt	$t0, $s2, $s3		# Change to s3?
 	bnez	$t0, end_division_logical
 	move	$a0, $s2
 	jal	au_logical
