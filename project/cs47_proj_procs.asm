@@ -234,6 +234,28 @@ div_logical_loop:			# Check both arguments are positive upon entering the loop -
 	j	div_logical_loop
 	
 end_division_logical:
+	# checks for remainder and quotient for negativity
+	lw	$a0, 0($sp)	# get original value
+	lw	$a1, 4($sp)	# get original value
+	
+	li	$t1, 31
+	get_bit($a0, $s0, $t1)
+	get_bit($a1, $t2, $t1)
+	xor	$t3, $t2, $s0
+	beqz	$t3, dont_change_quot
+
+	move	$a0, $s4
+	jal	invert_number
+	move	$s4, $v0
+dont_change_quot:
+	# check remainder
+	beqz	$s2, dont_change_rem	# dont invert 0
+	beqz	$s0, dont_change_rem
+	
+	move	$a0, $s2
+	jal	invert_number
+	move	$s2, $v0
+dont_change_rem:
 	move	$v1, $s2	# Remainder
 	move	$v0, $s4	# Quotient
 	
