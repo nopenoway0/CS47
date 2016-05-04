@@ -158,7 +158,7 @@ dont_invert_a1:
 mult_logical_loop:
 	beqz	$s3, mult_logical_end
 	slti	$t0, $s4, 16
-	beqz	$t0, mult_logical_hi
+	beqz	$t0, mult_logical_end
 	get_bit($s3, $t0, $zero)	# $s0 is product lo
 	beqz	$t0, mult_is_not_1	# $s1 carry over if necessary					
 mult_is_1:				# $s2 multiplier
@@ -173,25 +173,6 @@ mult_is_not_1:
 	srl	$s3, $s3, 1
 	addi	$s4, $s4, 1
 	j	mult_logical_loop
-	
-mult_logical_hi:
-	li	$s4, 0
-	
-mult_logical_loop_hi:
-	beqz	$s3,multiplier_zero
-	get_bit($s3, $t0, $zero)	# $s5 is product hi
-	beqz	$t0, mult_is_not_1_hi	# $s1 carry over if necessary					
-mult_is_1_hi:				# $s2 multiplier
-	or	$a0, $s2, $zero		# $s3 multiplicand the right -> shifter
-	or	$a1, $s5, $zero	
-	ori	$a2, $zero, 0x2B 
-	jal	au_logical
-	or 	$s5, $v0, $zero	
-						
-mult_is_not_1_hi:
-	sll	$s2, $s2, 1
-	srl	$s3, $s3, 1
-	j	mult_logical_loop_hi
 	
 mult_logical_end:
 	or	$v0, $s0, $zero
