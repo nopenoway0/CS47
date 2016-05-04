@@ -132,52 +132,8 @@ end_logical_loop:
 	j	restore_return_logical
 	
 mult_logical:
-	li	$s4, 0
-	li	$s1, 0
-	li	$s5, 0
-	
-	li	$t1, 31
-	get_bit($a0, $t0, $t1)
-	or	$s2, $zero, $a0
-	beqz	$t0, dont_invert_a0
-	jal	invert_number
-	or	$s2, $zero, $v0
-	
-dont_invert_a0:	
-	li	$t1, 31
-	get_bit($a1, $t0, $t1)
-	or	$s3, $a1, $zero
-	beqz	$t0, dont_invert_a1
-	move	$a0, $a1
-	jal	invert_number
-	or	$s3, $v0, $zero
-	
-dont_invert_a1:
-	j	mult_logical_loop
-	
-mult_logical_loop:
-	beqz	$s3, mult_logical_end
-	slti	$t0, $s4, 16
-	beqz	$t0, mult_logical_end
-	get_bit($s3, $t0, $zero)	# $s0 is product lo
-	beqz	$t0, mult_is_not_1	# $s1 carry over if necessary					
-mult_is_1:				# $s2 multiplier
-	or	$a0, $s2, $zero		# $s3 multiplicand the right -> shifter
-	or	$a1, $s0, $zero	
-	ori	$a2, $zero, 0x2B 
-	jal	au_logical
-	or 	$s0, $v0, $zero		
-					
-mult_is_not_1:
-	sll	$s2, $s2, 1
-	srl	$s3, $s3, 1
-	addi	$s4, $s4, 1
-	j	mult_logical_loop
-	
-mult_logical_end:
-	or	$v0, $s0, $zero
-	or	$v1, $s5, $zero
 	j	restore_return_logical
+
 	
 div_logical:
 	li	$s0, 0	# Quotient
@@ -255,15 +211,6 @@ restore_return_logical:
 	lw	$s5, 44($sp)
 	addi	$sp, $sp, 52
 	jr 	$ra
-
-multiplier_zero:
-	li	$t0, 31
-	get_bit($a0, $t1, $t0)
-	get_bit($a1, $t2, $t0)
-	xor	$t3, $t2, $t1
-	beqz	$t3, mult_logical_end
-	nor	$s5, $zero, $zero
-	j	mult_logical_end
 
 # Inverts a0 and stores it into v0
 invert_number:
