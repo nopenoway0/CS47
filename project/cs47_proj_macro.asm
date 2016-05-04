@@ -83,6 +83,8 @@
 	
 	.macro	insert_bit($r_reg, $bit, $bit_place)
 	sllv	$bit, $bit, $bit_place
+	sll	$r_reg, $r_reg, 1
+	srl	$r_reg, $r_reg, 1
 	or	$r_reg, $r_reg, $bit
 	.end_macro
 	
