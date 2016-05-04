@@ -137,29 +137,42 @@ end_logical_loop:
 # t3 = counter	
 mult_logical:
 	or	$s1, $a1, $zero
-	li	$s2, 0
-	li	$s3, 31
-	li	$s1, 0
+	li	$s0, 0
+	li	$t0, 31
+	get_bit($a0, $s4, $t0)
+	get_bit($a1, $s5, $t0)
+	beqz	$s4, dont_invert_first_a
+	jal	invert_number
+	or	$s2, $v0, $zero
+dont_invert_first_a:
+	beqz	$s5, dont_invert_second_a
+	or	$a0, $a1, $zero
+	jal	invert_number
+	or	$s1, $v0, $zero
+dont_invert_second_a:
+	li	$s0, 0
+	li	$s3, 32
 mult_logical_loop:
-	beqz	$t0, end_mult
+	beqz	$s3, end_mult
 	get_bit($s1, $t1, $zero)
 	beqz	$t1, bit_not_1
-	move	$a1, $s1
+	move	$a1, $s0
 	li	$a2, 0x2B
 	jal	au_logical
-	or	$s1, $v0, $zero
+	or	$s0, $v0, $zero
 bit_not_1:
 	srl	$s1, $s1, 1
-	get_bit($s2, $t1, $zero)
+	get_bit($s0, $t1, $zero)
 	li	$t3, 31
 	insert_bit($s1, $t1, $t3)
-	srl	$s2, $s2, 1
+	srl	$s0, $s0, 1
 	addi	$s3, $s3, -1
 	j	mult_logical_loop
 	
 end_mult:
 	move	$v0, $s1
 	move	$v1, $s0
+	j	restore_return_logical
 	
 div_logical:
 	li	$s0, 0	# Quotient
