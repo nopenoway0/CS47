@@ -178,9 +178,7 @@ sign_check:
 	move	$a0, $s1	
 	jal	invert_number
 	move	$s1, $v0
-	move	$a0, $s0
-	jal	invert_number
-	move	$s0, $v0
+	nor	$s0, $s0, $zero
 	
 end_mult:
 	move	$v0, $s1
