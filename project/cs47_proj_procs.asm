@@ -130,10 +130,31 @@ add_logical_loop:
 end_logical_loop:
 	or	$v0, $s0, $zero
 	j	restore_return_logical
-	
-mult_logical:
-	j	restore_return_logical
 
+# s0 = product hi
+# s1 = product lo - also multiplier
+# s2 = multiplicand
+# t0 = counter	
+mult_logical:
+	or	$s1, $a1, $zero
+	li	$s2, 0
+	li	$t0, 31
+	li	$s1, 0
+mult_logical_loop:
+	beqz	$t0, restore_return_logical
+	get_bit($s1, $t1, $zero)
+	beqz	$t1, bit_not_1
+	move	$a1, $s1
+	li	$a2, 0x2B
+	jal	au_logical
+	or	$s1, $v0, $zero
+bit_not_1:
+	srl	$s1, $s1, 1
+	get_bit($s2, $t1, $zero)
+	li	$t3, 31
+	insert_bit($s1, $t1, $t3)
+	srl	$s2, $s2, 1
+	addi	$t0, $t0, -1
 	
 div_logical:
 	li	$s0, 0	# Quotient
