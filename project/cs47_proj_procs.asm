@@ -134,13 +134,14 @@ end_logical_loop:
 # s0 = product hi
 # s1 = product lo - also multiplier
 # s2 = multiplicand
-# t3 = counter	
+# s3 = counter	
 mult_logical:
 	or	$s1, $a1, $zero
 	li	$s0, 0
 	li	$t0, 31
 	get_bit($a0, $s4, $t0)
 	get_bit($a1, $s5, $t0)
+	or	$s2, $a0, $zero
 	beqz	$s4, dont_invert_first_a
 	jal	invert_number
 	or	$s2, $v0, $zero
@@ -155,7 +156,7 @@ dont_invert_second_a:
 	li	$s0, 0
 	li	$s3, 32
 mult_logical_loop:
-	beqz	$s3, end_mult
+	beqz	$s3, sign_check
 	get_bit($s1, $t1, $zero)
 	beqz	$t1, bit_not_1
 	move	$a1, $s0
@@ -170,6 +171,16 @@ bit_not_1:
 	srl	$s0, $s0, 1
 	addi	$s3, $s3, -1
 	j	mult_logical_loop
+	
+sign_check:
+	xor	$t0, $s4, $s5
+	beqz	$t0, end_mult
+	move	$a0, $s1	
+	jal	invert_number
+	move	$s1, $v0
+	move	$a0, $s0
+	jal	invert_number
+	move	$s0, $v0
 	
 end_mult:
 	move	$v0, $s1
