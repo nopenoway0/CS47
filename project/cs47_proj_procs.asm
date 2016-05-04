@@ -144,11 +144,13 @@ mult_logical:
 	beqz	$s4, dont_invert_first_a
 	jal	invert_number
 	or	$s2, $v0, $zero
+	or	$a0, $s2, $zero
 dont_invert_first_a:
 	beqz	$s5, dont_invert_second_a
 	or	$a0, $a1, $zero
 	jal	invert_number
 	or	$s1, $v0, $zero
+	or	$a0, $s2, $zero
 dont_invert_second_a:
 	li	$s0, 0
 	li	$s3, 32
